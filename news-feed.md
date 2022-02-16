@@ -1,0 +1,210 @@
+## 1. General Requirements (Feature requirements)
+
+- Infinite scrollable news feed where stories appears based on user's subscriptions
+- User can share a story
+- User can post a story, and attach comments, links, images and videos
+
+## 2. Specific Requirements (Functional requirements, Platforms, etc.)
+
+- The feature is accessible to be available to a range of devices
+- The feature is accessible to people with disabilities
+
+## 3. Component Architechture
+
+- Dependency Graph
+
+  - Help understand how components are organized in our service code, how one component depend on another
+  - Help understand the data flows in our application. What data do we need to render each component
+
+- News Feed
+  - Story
+    - Story Card(s)
+    - Controls Panel
+    - Comment List
+      - Comment(s)
+    - Comment Input
+
+```TSX
+<Feed>
+  <Story>
+    <StoryCard />
+    <ControlsPanel/>
+    <CommentList>
+      <Comment/>
+      <Comment/>
+    </CommentList>
+    <CommentInput/>
+  </Story>
+</Feed>
+```
+
+## 4. Data Entities
+
+```typescript
+interface IStory {
+  id: number;
+  comments: IComment[];
+  media: IMedia[];
+  date: number; // Timestamp
+  content: string;
+  origin: {
+    id: number;
+    type: OriginType;
+    name: string;
+    // data
+  };
+}
+
+interface IComment {
+  id: number;
+  authorId: number;
+  media: IMedia[];
+  date: number; // Timestamp
+  content: string;
+}
+
+interface IMedia {
+  type: "link" | "video";
+  url: string;
+}
+```
+
+## 5. Data API
+
+- REST
+  - Less Agile, need extra filters/endpoints to get the fields we need
+  - Very scalable becuase we have advantage of the HTTP architecture such as HTTP caching by default
+- GraphQL
+  - More Agile, able to easily select the fields we need from the client. Useful for multi-level data
+  - No HTTP caching, because GraphQL always use POST request
+
+```typescript
+declare function getPosts(
+  apiKey: string,
+  userId: number,
+  excludeComments: boolean,
+  cursor: number,
+  pageSize: number,
+  minId: number,
+  maxId: number
+);
+
+declare function createPost(apiKey: string, userId: number, postData: IPost);
+
+declare function createComment(
+  apiKey: string,
+  userId: number,
+  postId: number,
+  commentData: IComment
+);
+
+// For SSE
+declare function subscribeNewStories(apiKey: string, userId: number);
+```
+
+## 6. Data Store
+
+- Data store is how we organize (normalize) data so we have the fastest access to data
+- Resources on the frontend is usually limited. Since browser can run on a wide range of devices.
+- Need to define the fetching points of the application
+- We can use data store on the front end most efficiently if we organize data in a flat normalized format.
+- We don't want nested multi-level structure
+- We don't want to filter large arrays often
+- Normalize the store by the id of the feed(story)
+
+```typescript
+// Normalized store to provide efficient access
+interface IFeedStore {
+  [storyId in number]: IStory;
+}
+interface IUserStore {
+  [storyId in number]: IUser;
+}
+interface IMediaStore {
+  [storyId in number]: IMedia[];
+}
+interface IOriginStore {
+  [storyId in number]: IOrigin;
+}
+interface ICommentsStore {
+  [storyId in number]: IComment[];
+}
+```
+
+```TSX
+<Feed> // single fetching point
+  <Story storyId="a"> // Access the normalized store by storyId
+    <StoryCard storyId="a" />
+    <ControlsPanel storyId="a"/>
+    <CommentList storyId="a">
+      <Comment/>
+      <Comment/>
+    </CommentList>
+    <CommentInput storyId="b"/>
+  </Story>
+</Feed>
+```
+
+### Load new stories
+
+- How to efficiently load new posts without causing traffic overhead?
+  - Long Polling
+    - Client asks server for new data in an set interval (e.g. 200ms) (unidirectional)
+    - Cons.
+      - Large traffic overhead. Full request with tokens, headers, etc.
+      - Large latency, especially for mobile devices
+    - Pros.
+      - Simple technique
+  - WebSocket
+    - Bidirectional real-time data transfering between the client and server
+    - Cons.
+      - Does NOT support HTTP2 protocal
+      - More difficult to set up
+    - Pros.
+      - Fast
+      - Real-time
+  - Server Send Events(SSE)
+    - Server pushes data to the client (unidirectional)
+    - Pros.
+      - Works under HTTP2 protocal
+      - Effective, less overhead, we get only the data we need, no headers, etc.
+      - Easier to load balance v.s. polling or websocket
+    - Cons.
+      - Larger latency than WebSocket
+- We are going to load new stories with SSE
+
+## 7. Infinite Scroll
+
+- Why?
+  - News feed contains a log of entertainment content, multi-media content.
+  - We choose infinite scroll instead of pagination is because pagination is more suited for analytical data records rendered on a table
+  - Why we don't need a "Show more button". "Show more button" feels like a variant of pagination. We don't need it because it creates additional action on the user's end. Scrolling to the end of page is enough to let us know they would like to see more
+- How?
+
+  - Use IntersectionObserver API
+    - Detect if the current last post is intersecting with a sentinel element (intersection zone)
+  - Use scroll event to detect if the current last post is scrolled to bottom of its container
+
+    - ```typescript
+      element.addEventListener(
+        "scroll",
+        function (e) {
+          const element = e.target;
+          if (e.scrollHeight - e.scrollTop === e.clientHeight) {
+            console.log("scrolled to the bottom");
+          }
+        },
+        { passive: true }
+      );
+      ```
+
+    - Use passive listeners to improve scrolling performance
+
+  - List virtualization
+    - Keep maintaing a small number of list elements, only replace the data of those nodes when displaying new data
+    - Solves the performence issue when a user scrolls through thousands of posts
+    - List element at most will have 10-25 child list item elements, when new data needs to be displayed, re-use those list item elements, only swap the data in those nodes
+
+## 8. Optimization
+
+## 9. Accessibility (Devices, Disabilities, etc.)
