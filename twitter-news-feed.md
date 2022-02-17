@@ -201,10 +201,74 @@ interface ICommentsStore {
     - Use passive listeners to improve scrolling performance
 
   - List virtualization
-    - Keep maintaing a small number of list elements, only replace the data of those nodes when displaying new data
+    - Keep maintaing a small number of list elements, only replace the data of those nodes when the list is scrolled
     - Solves the performence issue when a user scrolls through thousands of posts
-    - List element at most will have 10-25 child list item elements, when new data needs to be displayed, re-use those list item elements, only swap the data in those nodes
 
 ## 8. Optimization
 
+- Network performance
+  - Optimize assets to load them faster
+    - GZIP
+    - [Brotli](https://wp-rocket.me/blog/brotli-vs-gzip-compression/) - for modern browsers that support it
+  - Images
+    - Webp format for browsers that support it, fallback to png
+    - Image optimizaion service
+      - Send viewport size along with the image url as query string
+      - https://company-img-123.png?viewport=300x300
+      - The service returns optimized image of appropriate sized
+    - Cache and serve the images from CDN (viewport size don't change that often) - Content lives closer to user
+    - Lazy load images "below the fold" with intersection observer
+    - Show image placeholders while loading (reduce perceived loading time)
+  - HTTP2
+    - Multiplexing
+      - We can load hundreds of resources in parallel
+      - Enables bundle(code) splitting
+        - route level bundle
+        - runtime bundle
+        - vendors bundle
+        - analytics bundle
+      - HTTP1 only supported 5 connections at most
+- Rendering performance
+  - First contentful paint (FCP)
+    - SSR initial feeds, get new feeds on the client side
+  - Cumulative layout shift (CLS)
+    - Pre-define image height and width to prevent layout shifts when image is loaded
+  - Preload resources
+  - Prefetch resources for next navigation
+  - CSS is a render blocking resource
+    - Keep CSS lean
+    - Inline critical styles to eliminate fetching additional resource
+  - Scripts
+    - Inline critical scripts to eliminate fetching additional resource
+    - Load scripts with async/defer attributes to prevent render blocking
+- JavaScript performance
+  - prevent operations from blocking UI interactions(single threaded)
+    - Use promise/async to run operations that takes time
+    - Cache results of heavy computation
+      - Web Workers
+- PWA (offline access)
+  - Use service workers to cache bundles
+    - feed.js
+    - feed.css
+    - Last updated stories data
+    - story media content
+
 ## 9. Accessibility (Devices, Disabilities, etc.)
+
+- Contrast ratio - 4.5:1
+- Dynamic font-sizes with CSS clamp
+- Semantic HTML structure
+- Provide proper aria-roles and attributes for custom components.
+  - aria-haspopup to announce the element can load another layer
+  - All inputs elements should have aria-live attribute. So assistive technology can inform user of content change
+- Support multiple color schemes
+  - For people with different types of color blindness
+- All images have valid alt text
+- Maintain tab order, focus management
+- Skip/Escape Link to support teleporting to specific sections of the app
+- Hotkeys
+  - Create new story
+  - Search
+  - Back to top
+  - Scroll up
+  - Scroll down
