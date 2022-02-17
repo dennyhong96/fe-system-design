@@ -208,8 +208,13 @@ interface ICommentsStore {
 
 - Network performance
   - Optimize assets to load them faster
+    - Request Header - accept-encoding: gzip, deflate, br tells server what type of encoding it accepts
     - GZIP
-    - [Brotli](https://wp-rocket.me/blog/brotli-vs-gzip-compression/) - for modern browsers that support it
+      - Fast and good at compressing
+    - [Brotli](https://wp-rocket.me/blog/brotli-vs-gzip-compression/)
+      - for modern browsers that support it
+      - even faster than GZIP
+      - designed to compress streams data, no need to compress whole static files ahead of time
   - Images
     - Webp format for browsers that support it, fallback to png
     - Image optimizaion service
