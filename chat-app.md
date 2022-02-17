@@ -12,4 +12,9 @@
 
 ## 6. Optimization
 
+- Network performance
+- Rendering performance
+- JavaScript performance
+- PWA (offline access)
+
 ## 7. Accessbility
