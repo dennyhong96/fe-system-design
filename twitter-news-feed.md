@@ -220,7 +220,7 @@ interface ICommentsStore {
     - Image optimizaion service
       - Send viewport size along with the image url as query string
       - https://company-img-123.png?viewport=300x300
-      - The service returns optimized image of appropriate sized
+      - The service returns optimized image of appropriate size
     - Cache and serve the images from CDN (viewport size don't change that often) - Content lives closer to user
     - Lazy load images "below the fold" with intersection observer
     - Show image placeholders while loading (reduce perceived loading time)
@@ -251,6 +251,7 @@ interface ICommentsStore {
     - Use promise/async to run operations that takes time
     - Cache results of heavy computation
       - Web Workers
+      - WASM
 - PWA (offline access)
   - Use service workers to cache bundles
     - feed.js
@@ -263,7 +264,7 @@ interface ICommentsStore {
 - Contrast ratio - 4.5:1
 - Dynamic font-sizes with CSS clamp
 - Semantic HTML structure
-- Provide proper aria-roles and attributes for custom components.
+- Provide proper aria-roles and attributes for custom components
   - aria-haspopup to announce the element can load another layer
   - All inputs elements should have aria-live attribute. So assistive technology can inform user of content change
 - Support multiple color schemes
@@ -277,3 +278,4 @@ interface ICommentsStore {
   - Back to top
   - Scroll up
   - Scroll down
+  - Help menu

@@ -49,6 +49,33 @@
 
 ## 4. Data API and protocol
 
+- Date API
+
+  ```typescript
+  declare function subscribeForMessage(
+    apiKey: string,
+    userId: number
+  ): Promise<void>;
+
+  declare function getContacts(
+    apiKey: string,
+    userId: number
+  ): Promise<ContactDto[]>;
+
+  declare function attachMedia(
+    apiKey: string,
+    userId: number,
+    messageId: number,
+    data: string // binary
+  ): Promise<void>;
+
+  declare function sendMessage(
+    apiKey: string,
+    userId: number,
+    message: IMessage
+  ): Promise<void>;
+  ```
+
 - ### Protocol
   - Long polling
     - Pros.
@@ -69,7 +96,7 @@
           - Asset zipping
           - Multiplexing
       - Hard to load balance
-        - Usually server has proxies and firefalls, they can sometimes filter TCP traffic, and re-connecting WebSockets is not a trivial to do in production.
+        - Usually server has proxies and firefalls, they can sometimes filter TCP traffic, and re-connecting WebSockets is not a trivial to do in production
         - Creating additional infrastructure that needs to be maintained
         - Costing additional resources
   - Server Sent Events
@@ -81,7 +108,7 @@
         - Multiplexing
       - Don't transfer unneccessary data, no headers, tokens, cookies, etc.
       - SSE doesn't waste device resources, doesn't drain battery life
-      - Easier to load balance and re-connect from infrastructure perspective (in-case one server node has gone offline)
+      - Easier to load balance. Because HTTP2 enables multiplexing, it allows the client to receive data from different server nodes without breaking the connection with load balancer
     - Cons.
       - Weird API
       - Uni-directional, server to client only
@@ -92,11 +119,133 @@
 
 ## 5. Data Entities and Store
 
+```typescript
+interface IContact {
+  id: number;
+  name: string;
+}
+
+interface IMessage {
+  id: number;
+  content: string;
+  attachments?; IAttachment[];
+  authorId: number;
+  receiverId: number;
+  timestamp: number;
+}
+
+interface IAttachment {
+  id: number;
+  messageId:number;
+  type: 'link' | 'video' | 'audio'; // ...etc
+  url: string
+}
+```
+
+```typescript
+interface IContactStore {
+  [cid in string]: IContact;
+}
+interface IMessageStore {
+  [cid in string]: IMessage[];
+}
+interface IAttachmentStore {
+  [mid in string]: IAttachment[];
+}
+```
+
+```TSX
+<ChatApp> // single fetching point
+  <ContactList cids={["a","b"]}> // look up ContactStore
+    <SearchBox/>
+    <Contact cid="a" /> // look up ContactStore
+    <Contact cid="b" />
+  </ContactList>
+  <ChatView>
+    <MessageList cid="a"> // look up MessageStore
+      <Message>
+        <MessageActions /> // reply, copy, share, delete
+      </Message>
+      <Message>
+        <AttachmentList mid="a"> // look up AttachmentStore
+          <Attachment/>
+          <Attachment/>
+        </AttachmentList>
+        <MessageActions />
+      </Message>
+    </MessageList>
+    <Controls>
+      <Input/>
+      <InputActions/> // media, emoji, quick photo, record audio
+    </Controls>
+  </ChatView>
+</ChatApp>
+```
+
 ## 6. Optimization
 
 - Network performance
+  - GZIP (50% smaller)
+  - Brotli (70% smaller)
+  - HTTP2 Protocol
+    - Enabls multiplexing
+      - Fetch multiple resources in parallel under one connection
+      - Don't have to bundle the app in a single file
+  - code splitting
+    - Vendor Bundle
+    - Chat Bundle
+    - ES6 Bundle
+      - For modern browsers, so we don't need to ship extra polyfills
+  - Images
+    - Webp format for browsers that support it, fallback to png
+    - Image optimizaion service
+      - Send viewport size along with the image url as query string
+      - https://company-img-123.png?viewport=300x300
+      - The service returns optimized image of appropriate size
+      - Cache and serve the images from CDN (viewport size don't change that often) Content lives closer to user
+  - Resource minification
+  - Non-critical resources
+    - Load asynchronously with link rel="preload"
+  - Efficient caching policy
+    - Etag
+    - Last modified date
 - Rendering performance
+  - Inline critical resources
+  - Defer loading of non-critical resources
+  - Defer loading of analytic resources
+  - Use CSS animation instead of JavaScript to avoid reflow(whole page re-render)
+  - Cumulative layout shift (CLS)
+    - Pre-define image height and width to prevent layout shifts when image is loaded
+  - DOM performance
+    - List virtualization
+      - Use constant number of nodes for list elements
+      - Replace data on the list elements when we need to display need data
 - JavaScript performance
+  - prevent operations from blocking UI interactions(single threaded)
+    - Use promise/async to run operations that takes time
+    - Cache results of heavy computation
+      - Web Workers
+      - WASM
 - PWA (offline access)
+  - Use service workers to cache bundles
+    - chat.js
+    - chat.css
+    - Messages data
+    - Messages media content
 
 ## 7. Accessbility
+
+- Use rem units instead of px, adapts to browser zoom and customer font sizes
+- Hotkeys
+  - Next contact
+  - Previous contact
+  - Procees to message view
+  - Attach media
+  - Search
+  - Help menu
+- Provide color scheme variations for different types of color blindness
+- Provide proper aria-roles and attributes for custom components
+  - aria-haspopup to announce the element can load another layer
+  - All inputs elements should have aria-live attribute. So assistive technology can inform user of content change
+- All images have valid alt text
+- Semantic HTML structure
