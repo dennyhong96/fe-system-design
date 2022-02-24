@@ -4,21 +4,21 @@ Use the 7-step model
 
 ### 1. General Requirements (Feature requirements)
 
-### 2. Specific Requirements (Functional requirements, Platforms, etc.)
+### 2. Functional Requirements (Platforms, etc.)
 
 ### 3. Component Architechture
 
-### 4. Data API and protocol
+### 4. Data Entities
 
-### 5. Data Entities and Store Normalization
+### 5. Data API and protocol
 
-- Component Data Dependency
+### 6. Store Normalization
 
-### 6. Optimization
+### 7. Optimization
 
 - Network performance
 - Rendering performance
 - JavaScript performance
 - PWA (offline access)
 
-### 7. Accessbility
+### 8. Accessbility
