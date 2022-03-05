@@ -1,6 +1,20 @@
-## Front End System Design
+# Feature/App Design Template
 
-Use the 7-step model
+## 1. General Requirements (Feature requirements)
+
+### 2. Specific Requirements (Functional requirements, Platforms, Target Browsers, etc.)
+
+## 3. Component Architechture
+
+## 4. Data API and protocol
+
+## 5. Data Entities and Store
+
+## 6. Optimization
+
+## 7. Accessbility
+
+# Widget/Component Design Template
 
 ### 1. General Requirements (Feature requirements)
 
@@ -8,25 +22,14 @@ Use the 7-step model
 
 ### 3. Component Architechture
 
-### 4. Data Entities
+### 4. API Design
 
-### 5. Data API and protocol
+### 5. Store (Local component state)
 
-### 6. Store Normalization
+### 6. Optimization
 
-### 7. Optimization
-
-- Network performance
-- Rendering performance
-- JavaScript performance
-- PWA (offline access)
+### 7. Extensibility
 
 ### 8. Accessbility
 
-### 9. Other services
-
-- Sentry - Error logger
-- LogRocket - Recorded user sessions
-- LaunchDarkly - Feature flag service
-- Segment - Data tracking
-- A/B test???
+### 9. NPM Package Distribution
