@@ -1,20 +1,20 @@
-# Feature/App Design Template
+## Feature/App Design Template
 
-## 1. General Requirements (Feature requirements)
+### 1. General Requirements (Feature requirements)
 
 ### 2. Specific Requirements (Functional requirements, Platforms, Target Browsers, etc.)
 
-## 3. Component Architechture
+### 3. Component Architechture
 
-## 4. Data API and protocol
+### 4. Data API and protocol
 
-## 5. Data Entities and Store
+### 5. Data Entities and Store
 
-## 6. Optimization
+### 6. Optimization
 
-## 7. Accessbility
+### 7. Accessbility
 
-# Widget/Component Design Template
+## Widget/Component Design Template
 
 ### 1. General Requirements (Feature requirements)
 
