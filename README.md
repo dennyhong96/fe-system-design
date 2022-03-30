@@ -22,13 +22,13 @@
 
 ### 3. Component Architechture
 
-### 4. API Design
+### 4. Design Props (arguments passed to the Widget constructor) & API (Methods of Widget Instance, init(), destroy(), etc...)
 
-### 5. Store (Local component state)
+### 5. State Design (Local component state), Data flow
 
 ### 6. Optimization
 
-### 7. Extensibility
+### 7. Extensibility (Custom render funciton, Callbacks, CSS theming)
 
 ### 8. Accessbility
 
