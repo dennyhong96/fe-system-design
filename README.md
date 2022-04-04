@@ -48,6 +48,13 @@ API - methods the widget expose
 ### 6. Optimization
 
 - Network:
+  - GZIP & Brotli & Minify CSS/JS Assets
+  - HTTP2 Multiplexing
+    - more granular/modular bundles
+      - core bundle
+      - utils bundle
+      - theming bundles
+    - ES6 Bundle
   - debounce
   - caching
     - Server cache
@@ -63,6 +70,7 @@ API - methods the widget expose
   - Loading placeholders
 - JavaScript:
   - delegate work to server
+  - event delegation
   - ...
 
 ### 7. Extensibility
